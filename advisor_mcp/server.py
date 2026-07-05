@@ -30,7 +30,7 @@ OAUTH_BETA = "oauth-2025-04-20"
 CLAUDE_CODE_IDENTITY = "You are Claude Code, Anthropic's official CLI for Claude."
 
 DEFAULT_MODEL = os.environ.get("ADVISOR_MODEL", "claude-fable-5")
-DEFAULT_MAX_TOKENS = int(os.environ.get("ADVISOR_MAX_TOKENS", "4096"))
+DEFAULT_MAX_TOKENS = int(os.environ.get("ADVISOR_MAX_TOKENS", "128000"))
 REQUEST_TIMEOUT = float(os.environ.get("ADVISOR_TIMEOUT", "120"))
 
 ADVISOR_ROLE = (
