@@ -34,7 +34,7 @@ source (or point to an explicit token) via `.env` — see `.env.example`.
 Requires Python 3.13 and [pipenv](https://pipenv.pypa.io/).
 
 ```bash
-cd C:\Users\mesol\workspace\advisor
+cd /path/to/advisor-mcp
 pipenv install
 cp .env.example .env   # optional — defaults reuse your Max subscription
 ```
@@ -50,8 +50,8 @@ The server is registered in `~/.claude.json` under `mcpServers` so it loads for
   "command": "cmd",
   "args": ["/c", "pipenv", "run", "python", "-m", "advisor_mcp.server"],
   "env": {
-    "PIPENV_PIPFILE": "C:\\Users\\mesol\\workspace\\advisor\\Pipfile",
-    "PYTHONPATH": "C:\\Users\\mesol\\workspace\\advisor"
+    "PIPENV_PIPFILE": "C:\\path\\to\\advisor-mcp\\Pipfile",
+    "PYTHONPATH": "C:\\path\\to\\advisor-mcp"
   }
 }
 ```
