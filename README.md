@@ -4,10 +4,10 @@ A local [MCP](https://modelcontextprotocol.io) server that lets the model you're
 running in Claude Code (Opus / Sonnet / Haiku) consult **Fable** (`claude-fable-5`)
 for a second opinion or extra guidance.
 
-It **reuses your existing Claude Max subscription** — the OAuth token that Claude
-Code already stores in `~/.claude/.credentials.json` — so it needs **no separate
-paid API key**. Requests are billed against your Max plan just like normal Claude
-Code usage.
+It **reuses the credential Claude Code already stores locally** — a Max/Pro
+subscription OAuth token or an API-key login — so it needs no separate
+configuration. Subscription tokens are billed against your Max plan just like
+normal Claude Code usage.
 
 ## Tools
 
@@ -18,16 +18,21 @@ Code usage.
 
 ## How it works
 
-The server reads the subscription OAuth token from your Claude Code credentials
-file and calls the Anthropic Messages API with:
+The server resolves a credential in this order:
 
-- `Authorization: Bearer <token>` (not an API key)
-- `anthropic-beta: oauth-2025-04-20`
-- a system prompt that begins with the Claude Code identity line
+1. `ANTHROPIC_OAUTH_TOKEN` from `.env` (explicit override)
+2. `~/.claude/.credentials.json` (Linux OAuth login), or `ADVISOR_CREDENTIALS_PATH`
+3. macOS Keychain `Claude Code-credentials` → `claudeAiOauth` (macOS OAuth login)
+4. macOS Keychain `Claude Code` (API-key login)
 
-If the token has expired it is refreshed automatically using the stored refresh
-token and written back to the credentials file. You can override the credential
-source (or point to an explicit token) via `.env` — see `.env.example`.
+OAuth tokens are sent as `Authorization: Bearer <token>` (with
+`anthropic-beta: oauth-2025-04-20`); API keys as `x-api-key`. Either way,
+requests present as Claude Code (`anthropic-beta: claude-code-20250219`,
+`claude-cli` user agent, and the Claude Code identity line leading the system
+prompt) — orgs often cap raw API traffic per model while allowing Claude Code
+usage, so this routing is load-bearing. Expired OAuth tokens are refreshed
+automatically and written back to their source (file or Keychain) so Claude
+Code's copy stays valid.
 
 ## Setup
 

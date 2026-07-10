@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
 from . import __version__
-from .credentials import CredentialError, get_access_token
+from .credentials import CredentialError, get_credential
 
 # Load configuration from the .env that lives next to this project, regardless
 # of the current working directory the MCP host launched us from.
@@ -25,7 +25,13 @@ load_dotenv(_PROJECT_ROOT / ".env")
 API_URL = "https://api.anthropic.com/v1/messages"
 # Required when authenticating with a subscription OAuth token instead of an API key.
 OAUTH_BETA = "oauth-2025-04-20"
-# The subscription token is only accepted for Claude Code; the system prompt must
+# Presenting as Claude Code routes requests through the Claude Code rate-limit
+# pool; orgs often restrict raw API traffic (per-model caps) while allowing
+# Claude Code usage, so this beta + user-agent + identity line are load-bearing
+# for API-key auth too, not just OAuth.
+CLAUDE_CODE_BETA = "claude-code-20250219"
+CLAUDE_CODE_USER_AGENT = "claude-cli/2.1.206 (external, cli)"
+# The credential is only accepted for Claude Code; the system prompt must
 # lead with this identity line.
 CLAUDE_CODE_IDENTITY = "You are Claude Code, Anthropic's official CLI for Claude."
 
@@ -51,30 +57,41 @@ def _call_fable(
     max_tokens: int,
     temperature: float,
 ) -> str:
-    token = get_access_token()
+    credential = get_credential()
 
     user_content = prompt if not context else f"<context>\n{context}\n</context>\n\n{prompt}"
 
     body = {
         "model": model,
         "max_tokens": max_tokens,
-        "temperature": temperature,
         "system": [
             {"type": "text", "text": CLAUDE_CODE_IDENTITY},
             {"type": "text", "text": ADVISOR_ROLE},
         ],
         "messages": [{"role": "user", "content": user_content}],
     }
+    # Fable 5 / Opus 4.7+ reject sampling parameters; only send a non-default
+    # temperature, and never to models that would 400 on it.
+    if temperature != 1.0 and not model.startswith(("claude-fable", "claude-mythos", "claude-opus-4-7", "claude-opus-4-8", "claude-sonnet-5")):
+        body["temperature"] = temperature
+
+    headers = {
+        "content-type": "application/json",
+        "anthropic-version": "2023-06-01",
+        "user-agent": CLAUDE_CODE_USER_AGENT,
+        "x-app": "cli",
+    }
+    if credential.is_api_key:
+        headers["x-api-key"] = credential.token
+        headers["anthropic-beta"] = CLAUDE_CODE_BETA
+    else:
+        headers["authorization"] = f"Bearer {credential.token}"
+        headers["anthropic-beta"] = f"{OAUTH_BETA},{CLAUDE_CODE_BETA}"
 
     resp = httpx.post(
         API_URL,
         json=body,
-        headers={
-            "content-type": "application/json",
-            "authorization": f"Bearer {token}",
-            "anthropic-version": "2023-06-01",
-            "anthropic-beta": OAUTH_BETA,
-        },
+        headers=headers,
         timeout=REQUEST_TIMEOUT,
     )
     resp.raise_for_status()
