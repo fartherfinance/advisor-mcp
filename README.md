@@ -6,7 +6,7 @@ for a second opinion or extra guidance.
 
 It **reuses the credential Claude Code already stores locally** — a Max/Pro
 subscription OAuth token or an API-key login — so it needs no separate
-configuration. Subscription tokens are billed against your Max plan just like
+configuration. Subscription tokens are billed against your plan just like
 normal Claude Code usage.
 
 ## Tools
