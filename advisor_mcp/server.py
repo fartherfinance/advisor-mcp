@@ -1,7 +1,7 @@
 """advisor-mcp server.
 
 Exposes tools that let the running model (Opus / Sonnet / Haiku) consult Fable
-(``claude-fable-5`` by default) for a second opinion or extra guidance, billed to
+(``claude-fable-5-1`` by default) for a second opinion or extra guidance, billed to
 the existing Claude Max subscription via its OAuth token.
 """
 
@@ -35,7 +35,7 @@ CLAUDE_CODE_USER_AGENT = "claude-cli/2.1.206 (external, cli)"
 # lead with this identity line.
 CLAUDE_CODE_IDENTITY = "You are Claude Code, Anthropic's official CLI for Claude."
 
-DEFAULT_MODEL = os.environ.get("ADVISOR_MODEL", "claude-fable-5")
+DEFAULT_MODEL = os.environ.get("ADVISOR_MODEL", "claude-fable-5-1")
 DEFAULT_MAX_TOKENS = int(os.environ.get("ADVISOR_MAX_TOKENS", "128000"))
 REQUEST_TIMEOUT = float(os.environ.get("ADVISOR_TIMEOUT", "120"))
 
@@ -129,7 +129,7 @@ def ask_advisor(
         context: Optional supporting material (code, error output, a draft plan)
             that the advisor should consider when answering.
         model: Advisor model to query. Defaults to the configured model
-            (``claude-fable-5``).
+            (``claude-fable-5-1``).
         max_tokens: Maximum tokens in the advisor's response.
         temperature: Sampling temperature (0.0-1.0).
 

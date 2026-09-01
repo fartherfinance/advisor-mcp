@@ -1,7 +1,7 @@
 # advisor-mcp
 
 A local [MCP](https://modelcontextprotocol.io) server that lets the model you're
-running in Claude Code (Opus / Sonnet / Haiku) consult **Fable** (`claude-fable-5`)
+running in Claude Code (Opus / Sonnet / Haiku) consult **Fable** (`claude-fable-5-1`)
 for a second opinion or extra guidance.
 
 It **reuses the credential Claude Code already stores locally** — a Max/Pro
