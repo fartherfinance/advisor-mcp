@@ -5,3 +5,7 @@ __pycache__/
 .venv/
 .DS_Store
 *.advisor.tmp
+
+# Claude Code local files (personal, never committed)
+CLAUDE.local.md
+**/.claude/settings.local.json
